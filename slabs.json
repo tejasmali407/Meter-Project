@@ -1,0 +1,97 @@
+{
+  "state": "Maharashtra",
+  "currency": "INR",
+  "disclaimer": "Estimated bill only. Not an official bill.",
+  "districts": [
+    {
+      "id": "jalgaon",
+      "label": "Jalgaon",
+      "provider": "MSEDCL",
+      "billModes": {
+        "residential": {
+          "fixedCharge": 130,
+          "taxesAndSurcharges": [
+            { "label": "Electricity duty", "type": "percentage", "value": 16 }
+          ],
+          "slabs": [
+            { "from": 0, "to": 100, "rate": 4.28 },
+            { "from": 101, "to": 300, "rate": 6.45 },
+            { "from": 301, "to": null, "rate": 7.60 }
+          ]
+        },
+        "commercial": {
+          "fixedCharge": 200,
+          "taxesAndSurcharges": [
+            { "label": "Electricity duty", "type": "percentage", "value": 16 }
+          ],
+          "slabs": [
+            { "from": 0, "to": 100, "rate": 6.50 },
+            { "from": 101, "to": 300, "rate": 8.20 },
+            { "from": 301, "to": null, "rate": 9.80 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pune",
+      "label": "Pune",
+      "provider": "MSEDCL",
+      "billModes": {
+        "residential": {
+          "fixedCharge": 120,
+          "taxesAndSurcharges": [
+            { "label": "Electricity duty", "type": "percentage", "value": 5 }
+          ],
+          "slabs": [
+            { "from": 0, "to": 100, "rate": 4.20 },
+            { "from": 101, "to": 300, "rate": 6.60 },
+            { "from": 301, "to": null, "rate": 7.80 }
+          ]
+        },
+        "commercial": {
+          "fixedCharge": 180,
+          "taxesAndSurcharges": [
+            { "label": "Electricity duty", "type": "percentage", "value": 5 }
+          ],
+          "slabs": [
+            { "from": 0, "to": 100, "rate": 6.20 },
+            { "from": 101, "to": 300, "rate": 8.10 },
+            { "from": 301, "to": null, "rate": 9.40 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mumbai",
+      "label": "Mumbai",
+      "provider": "Example DISCOM",
+      "billModes": {
+        "residential": {
+          "fixedCharge": 150,
+          "taxesAndSurcharges": [
+            { "label": "Electricity duty", "type": "percentage", "value": 5 }
+          ],
+          "slabs": [
+            { "from": 0, "to": 100, "rate": 4.50 },
+            { "from": 101, "to": 300, "rate": 6.90 },
+            { "from": 301, "to": null, "rate": 8.10 }
+          ]
+        },
+        "commercial": {
+          "fixedCharge": 210,
+          "taxesAndSurcharges": [
+            { "label": "Electricity duty", "type": "percentage", "value": 5 }
+          ],
+          "slabs": [
+            { "from": 0, "to": 100, "rate": 6.80 },
+            { "from": 101, "to": 300, "rate": 8.50 },
+            { "from": 301, "to": null, "rate": 9.90 }
+          ]
+        }
+      }
+    }
+  ]
+}
+
+
+

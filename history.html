@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="description" content="Bill history — Meter App" />
+    <title>History — Meter</title>
+    <link rel="icon" href="/img/fab-icon.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="app" aria-label="History page">
+
+        <!-- Disclaimer Banner -->
+        <div class="disclaimerBanner" role="alert">
+            <span class="disclaimerBannerText">⚠️ This is <strong>NOT</strong> an official electricity bill. For
+                educational and demonstration purposes only.</span>
+        </div>
+
+        <!-- Page Header -->
+        <header class="header">
+            <div>
+                <h1 class="title">📋 Bill History</h1>
+                <p class="subtitle">Your previously calculated electricity estimates</p>
+            </div>
+            <div class="headerRight">
+                <button class="secondaryBtn" onclick="window.location.href='index.html'"
+                    style="padding:8px 16px;font-size:14px">← Back to Home</button>
+            </div>
+        </header>
+
+        <!-- Actions row -->
+        <div class="historyPageActions" id="historyPageActions">
+            <button class="primaryBtn" id="downloadAllPdfBtn" style="min-width:180px">⬇ Download Full Report</button>
+            <button class="secondaryBtn" id="clearAllHistoryBtn"
+                style="color:var(--danger);border-color:var(--danger)">🗑 Clear All History</button>
+        </div>
+
+        <!-- History List -->
+        <section id="historyListSection">
+            <div id="historyListEmpty" class="card" hidden>
+                <div class="emptyResultState">
+                    <span class="emptyResultIcon">📊</span>
+                    <p class="emptyResultTitle">No history yet.</p>
+                    <p class="emptyResultDesc">Calculate your first bill to begin tracking usage.</p>
+                    <button class="primaryBtn" style="margin-top:16px" onclick="window.location.href='index.html'">←
+                        Calculate a Bill</button>
+                </div>
+            </div>
+            <div id="historyListGrid" class="historyPageGrid"></div>
+        </section>
+
+        <!-- Disclaimer footer -->
+        <div class="note noteLegal">
+            <strong>⚠️ Disclaimer:</strong> All bills shown here are <strong>estimated</strong> for educational and
+            tracking purposes only.
+            They are not official bills and are not affiliated with MSEDCL or any electricity board.
+        </div>
+
+        <footer class="footer">
+            <p>Meter — Electricity Bill Estimator. All data stored locally on your device.</p>
+        </footer>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+            const HISTORY_KEY = 'meter:history';
+
+            function getHistory() {
+                try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+                catch { return []; }
+            }
+
+            function fmt(n) {
+                return typeof n === 'number' && isFinite(n)
+                    ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(n)
+                    : '—';
+            }
+
+            function fmtDate(iso) {
+                try {
+                    return new Date(iso).toLocaleDateString('en-IN', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                } catch { return iso; }
+            }
+
+            function getBillLevel(units) {
+                if (units < 100) return { label: 'LOW', cls: 'levelLow' };
+                if (units <= 300) return { label: 'MEDIUM', cls: 'levelMedium' };
+                return { label: 'HIGH', cls: 'levelHigh' };
+            }
+
+            function renderHistory() {
+                const history = getHistory();
+                const grid = document.getElementById('historyListGrid');
+                const empty = document.getElementById('historyListEmpty');
+                const actions = document.getElementById('historyPageActions');
+
+                if (history.length === 0) {
+                    if (empty) empty.hidden = false;
+                    if (actions) actions.hidden = true;
+                    return;
+                }
+                if (empty) empty.hidden = true;
+                if (actions) actions.hidden = false;
+
+                grid.innerHTML = '';
+                history.forEach((entry, i) => {
+                    const level = getBillLevel(Number(entry.unitsUsed));
+                    const card = document.createElement('div');
+                    card.className = 'card historyPageCard';
+                    card.innerHTML = `
+            <div class="historyPageCardTop">
+              <div>
+                <div class="historyPageDate">${fmtDate(entry.date)}</div>
+                <div class="historyPageDistrict">${entry.district || '—'} &middot; <span class="historyPageMode">${entry.billMode || '—'}</span></div>
+              </div>
+              <span class="historyPageLevelBadge ${level.cls}">${level.label}</span>
+            </div>
+            <div class="historyPageStats">
+              <div class="historyPageStat">
+                <div class="historyPageStatLabel">Units Used</div>
+                <div class="historyPageStatValue">${fmt(Number(entry.unitsUsed))} kWh</div>
+              </div>
+              <div class="historyPageStat">
+                <div class="historyPageStatLabel">Estimated Bill</div>
+                <div class="historyPageStatValue historyPageBillValue">₹ ${fmt(Number(entry.estimatedBill))}</div>
+              </div>
+              <div class="historyPageStat">
+                <div class="historyPageStatLabel">Daily avg.</div>
+                <div class="historyPageStatValue">₹ ${(Number(entry.estimatedBill) / 30).toFixed(1)}/day</div>
+              </div>
+            </div>
+            <div class="historyPageCardActions">
+              <button class="secondaryBtn historyPdfBtn" data-idx="${i}" style="font-size:13px;padding:8px 14px">⬇ Download PDF</button>
+            </div>
+          `;
+                    grid.appendChild(card);
+                });
+
+                // Per-entry PDF buttons
+                grid.querySelectorAll('.historyPdfBtn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.getAttribute('data-idx'));
+                        exportSinglePDF(history[idx], idx === 0);
+                    });
+                });
+            }
+
+            function exportAllPDF() {
+                const history = getHistory();
+                if (history.length === 0) { alert('No history to export.'); return; }
+                if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+                    alert('PDF library is loading. Try again in a moment.'); return;
+                }
+                const jsPDF = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
+                const doc = new jsPDF();
+                const pageW = doc.internal.pageSize.getWidth();
+                const pageH = doc.internal.pageSize.getHeight();
+
+                // Header
+                doc.setFillColor(37, 99, 235);
+                doc.rect(0, 0, pageW, 28, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+                doc.text('Meter — Electricity Usage Report', 14, 17);
+                doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+                doc.text('Generated: ' + new Date().toLocaleString(), pageW - 14, 10, { align: 'right' });
+
+                doc.setTextColor(30, 30, 30);
+                let y = 40;
+
+                // Summary of latest
+                const latest = history[0];
+                doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+                doc.text('Latest Reading Summary', 14, y); y += 8;
+                const fields = [
+                    ['Date', fmtDate(latest.date)], ['District', latest.district],
+                    ['Bill Mode', latest.billMode],
+                    ['Units Used', fmt(Number(latest.unitsUsed)) + ' kWh'],
+                    ['Estimated Bill', 'Rs. ' + fmt(Number(latest.estimatedBill))],
+                    ['Daily Cost (est.)', 'Rs. ' + (Number(latest.estimatedBill) / 30).toFixed(2) + ' / day'],
+                ];
+                doc.setFontSize(10);
+                fields.forEach(([label, value], i) => {
+                    doc.setFillColor(i % 2 === 0 ? 245 : 255, i % 2 === 0 ? 247 : 255, i % 2 === 0 ? 250 : 255);
+                    doc.rect(12, y - 5, pageW - 24, 10, 'F');
+                    doc.setFont('helvetica', 'bold'); doc.text(label, 16, y);
+                    doc.setFont('helvetica', 'normal'); doc.text(String(value), 90, y);
+                    y += 12;
+                });
+
+                // History table
+                if (history.length > 1) {
+                    y += 6;
+                    doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+                    doc.text('Full History (last 10)', 14, y); y += 8;
+                    doc.setFontSize(10);
+                    doc.setFillColor(37, 99, 235); doc.setTextColor(255, 255, 255);
+                    doc.rect(12, y - 5, pageW - 24, 9, 'F');
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Date', 14, y); doc.text('Units', 75, y);
+                    doc.text('Est. Bill', 110, y); doc.text('District', 150, y);
+                    y += 8;
+                    doc.setTextColor(30, 30, 30);
+                    history.forEach((e, i) => {
+                        if (y > 270) return;
+                        doc.setFillColor(i % 2 === 0 ? 245 : 255, i % 2 === 0 ? 247 : 255, i % 2 === 0 ? 250 : 255);
+                        doc.rect(12, y - 5, pageW - 24, 8, 'F');
+                        doc.setFont('helvetica', i === 0 ? 'bold' : 'normal');
+                        doc.text(fmtDate(e.date), 14, y);
+                        doc.text(String(Number(e.unitsUsed).toFixed(1)), 75, y);
+                        doc.text('Rs.' + Number(e.estimatedBill).toFixed(0), 110, y);
+                        doc.text(String(e.district || '—').substring(0, 20), 150, y);
+                        y += 9;
+                    });
+                }
+
+                // Footer
+                doc.setFillColor(245, 247, 250);
+                doc.rect(0, pageH - 16, pageW, 16, 'F');
+                doc.setFontSize(7); doc.setTextColor(120, 120, 120);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Estimated bill for tracking purposes only. Not an official MSEDCL document.', 14, pageH - 6);
+
+                doc.save('meter-full-report-' + new Date().toISOString().slice(0, 10) + '.pdf');
+            }
+
+            function exportSinglePDF(entry, isLatest) {
+                if (!entry) return;
+                if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+                    alert('PDF library is loading. Try again in a moment.'); return;
+                }
+                const jsPDF = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
+                const doc = new jsPDF();
+                const pageW = doc.internal.pageSize.getWidth();
+                const pageH = doc.internal.pageSize.getHeight();
+
+                doc.setFillColor(37, 99, 235);
+                doc.rect(0, 0, pageW, 28, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+                doc.text('Estimated Electricity Bill', 14, 17);
+                doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+                doc.text('Generated: ' + new Date().toLocaleString(), pageW - 14, 10, { align: 'right' });
+
+                doc.setTextColor(30, 30, 30);
+                let y = 40;
+                const fields = [
+                    ['Date', fmtDate(entry.date)], ['District', entry.district],
+                    ['Bill Mode', entry.billMode],
+                    ['Units Used', fmt(Number(entry.unitsUsed)) + ' kWh'],
+                    ['Estimated Bill', 'Rs. ' + fmt(Number(entry.estimatedBill))],
+                    ['Daily Cost', 'Rs. ' + (Number(entry.estimatedBill) / 30).toFixed(2) + ' / day'],
+                ];
+                doc.setFontSize(10);
+                fields.forEach(([label, value], i) => {
+                    doc.setFillColor(i % 2 === 0 ? 245 : 255, i % 2 === 0 ? 247 : 255, i % 2 === 0 ? 250 : 255);
+                    doc.rect(12, y - 5, pageW - 24, 10, 'F');
+                    doc.setFont('helvetica', 'bold'); doc.text(label, 16, y);
+                    doc.setFont('helvetica', 'normal'); doc.text(String(value), 90, y);
+                    y += 12;
+                });
+
+                doc.setFillColor(245, 247, 250);
+                doc.rect(0, pageH - 16, pageW, 16, 'F');
+                doc.setFontSize(7); doc.setTextColor(120, 120, 120);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Estimated bill for tracking only. Not an official document.', 14, pageH - 6);
+
+                doc.save('meter-bill-' + fmtDate(entry.date).replace(/ /g, '-') + '.pdf');
+            }
+
+            // Init
+            renderHistory();
+
+            const allPdfBtn = document.getElementById('downloadAllPdfBtn');
+            if (allPdfBtn) allPdfBtn.addEventListener('click', exportAllPDF);
+
+            const clearBtn = document.getElementById('clearAllHistoryBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    if (confirm('Clear all bill history? This cannot be undone.')) {
+                        localStorage.removeItem(HISTORY_KEY);
+                        renderHistory();
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

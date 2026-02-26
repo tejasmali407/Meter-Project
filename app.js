@@ -6,6 +6,8 @@
 const STORAGE_KEY = "meter:v4";
 const LANG_KEY = "meter:lang";
 const WELCOME_KEY = "meter:welcomeShown";
+const INSTRUCTION_KEY = "meter:instructionSeen";
+const LAST_BILL_KEY = "meter:lastBill";
 
 const translations = {
   en: {
@@ -39,7 +41,7 @@ const translations = {
     "result.totalHint": "Includes slab-wise amount plus fixed charge.",
     "result.slabBreakdown": "Slab-wise breakdown",
     "result.fixedCharges": "Fixed charges (if any)",
-    "result.taxes": "Taxes & Duties",
+    "result.taxes": "Estimated Govt. Charges (Approx 20%)",
     "legal.privacyTitle": "Privacy:",
     "legal.privacyText": "All calculations happen on your device. Data is stored only in localStorage.",
     "legal.disclaimerTitle": "Disclaimer:",
@@ -59,11 +61,11 @@ const translations = {
     "msg.enterValidReadings": "Enter valid readings.",
     "msg.breakdownEmpty": "Click “Calculate Bill” after selecting district + bill mode.",
     "msg.fixedCharge": "Fixed charge",
-    "msg.totalTax": "Total Tax",
+    "msg.totalTax": "Total Estimated Charges",
     "msg.slabSubtotal": "Slab subtotal",
     "msg.estimatedNotOfficial": "Estimated bill calculated. This is an estimated bill, not official.",
     "about.title": "How It Works",
-    "about.content": "This calculator estimates your electricity bill using slab-wise tariff rates. Here's how:\n1. Units Used: Current Reading − Last Paid Reading\n2. Slab Calculation: Units are distributed across tariff slabs, each with its own rate\n3. Fixed Charge: Added based on your district and bill mode\n4. Taxes: Calculated as a percentage of (slab total + fixed charge)\n5. Final Bill: Sum of all components\n\nNote: Rates are loaded from slabs.json. This is an estimate only, not an official bill.",
+    "about.content": "This calculator estimates your electricity bill using slab-wise tariff rates. Here's how:\n1. Units Used: Current Reading − Last Paid Reading\n2. Slab Calculation: Units are distributed across tariff slabs, each rounded individually\n3. Fixed Charge: Added based on your district and bill mode\n4. Adjustment Charge: Added as FAC (Fuel Adjustment Charge) based on units\n5. Taxes: Calculated as a percentage of (slab total + fixed charge + adjustment)\n6. Final Bill: Sum of all components with final rounding\n\nNote: Rates are loaded from slabs.json. This is an estimate only, not an official bill.",
     "msg.calculating": "Calculating...",
     "welcome.title": "Welcome to Meter",
     "welcome.subtitle": "Your Electricity Bill Estimator",
@@ -76,7 +78,32 @@ const translations = {
     "welcome.feature4.title": "Works Offline",
     "welcome.feature4.desc": "No internet required after first load",
     "welcome.note": "This is an estimated bill calculator for tracking purposes only. Not an official bill.",
-    "welcome.getStarted": "Get Started"
+    "welcome.getStarted": "Get Started",
+    "steps.readings": "Enter Readings",
+    "steps.location": "Select Location",
+    "steps.calculate": "Calculate Bill",
+    "trust.noData": "No personal data collected",
+    "trust.local": "Stored locally",
+    "trust.offline": "Works offline",
+    "result.emptyTitle": "Your bill estimate will appear here.",
+    "result.emptyDesc": "Enter readings and press Calculate.",
+    "result.ready": "Estimated Bill Ready",
+    "analytics.title": "Smart Analytics",
+    "analytics.subtitle": "Insights from your electricity usage history",
+    "analytics.dailyCostLabel": "Estimated Daily Cost",
+    "analytics.dailyCostHint": "Based on average monthly usage",
+    "analytics.tipLabel": "💡 Saving Tip",
+    "analytics.consumptionTitle": "Consumption Level",
+    "analytics.low": "LOW",
+    "analytics.medium": "MEDIUM",
+    "analytics.high": "HIGH",
+    "analytics.chartTitle": "Electricity Usage Trend",
+    "analytics.chartEmpty": "Calculate your bill to see your usage trend here.",
+    "analytics.historyTitle": "📋 Usage History",
+    "analytics.clearHistory": "Clear",
+    "analytics.historyEmpty": "No history yet. Calculate your first bill to begin tracking.",
+    "analytics.exportBtn": "⬇️ Download Usage Report",
+    "analytics.exportHint": "Download a PDF summary of your latest usage record."
   },
   mr: {
     "app.title": "मीटर",
@@ -109,7 +136,7 @@ const translations = {
     "result.totalHint": "स्लॅब रक्कम + स्थिर शुल्क.",
     "result.slabBreakdown": "स्लॅबनुसार तपशील",
     "result.fixedCharges": "स्थिर शुल्क (असल्यास)",
-    "result.taxes": "कर आणि शुल्क",
+    "result.taxes": "अंदाजित सरकारी शुल्क (अंदाजित २०%)",
     "legal.privacyTitle": "गोपनीयता:",
     "legal.privacyText": "सर्व गणना तुमच्या डिव्हाइसवर होते. डेटा फक्त localStorage मध्ये साठवला जातो.",
     "legal.disclaimerTitle": "सूचना:",
@@ -129,11 +156,11 @@ const translations = {
     "msg.enterValidReadings": "कृपया वैध रीडिंग द्या.",
     "msg.breakdownEmpty": "जिल्हा + बिल प्रकार निवडून “बिल काढा” दाबा.",
     "msg.fixedCharge": "स्थिर शुल्क",
-    "msg.totalTax": "एकूण कर",
+    "msg.totalTax": "एकूण अंदाजित शुल्क",
     "msg.slabSubtotal": "स्लॅब उपएकूण",
     "msg.estimatedNotOfficial": "अंदाजित बिल काढले. हे अधिकृत बिल नाही.",
     "about.title": "हे कसे काम करते",
-    "about.content": "हे कॅल्क्युलेटर स्लॅब-वाइज दर वापरून तुमच्या वीज बिलाचा अंदाज काढते:\n1. वापरलेली युनिट्स: सध्याचे रीडिंग − मागील भरलेले रीडिंग\n2. स्लॅब गणना: युनिट्स दर स्लॅबमध्ये वितरित केल्या जातात\n3. स्थिर शुल्क: जिल्हा आणि बिल प्रकारानुसार जोडले जाते\n4. कर: (स्लॅब एकूण + स्थिर शुल्क) वर टक्केवारी मोजली जाते\n5. अंतिम बिल: सर्व घटकांची बेरीज\n\nसूचना: दर slabs.json वरून लोड केले जातात. हा फक्त अंदाज आहे, अधिकृत बिल नाही.",
+    "about.content": "हे कॅल्क्युलेटर स्लॅब-वाइज दर वापरून तुमच्या वीज बिलाचा अंदाज काढते:\n1. वापरलेली युनिट्स: सध्याचे रीडिंग − मागील भरलेले रीडिंग\n2. स्लॅब गणना: युनिट्स दर स्लॅबमध्ये वितरित केल्या जातात, प्रत्येक स्लॅब राउंड केला जातो\n3. स्थिर शुल्क: जिल्हा आणि बिल प्रकारानुसार जोडले जाते\n4. समायोजन शुल्क (FAC): युनिट्सवर आधारित इंधन समायोजन शुल्क जोडले जाते\n5. कर: (स्लॅब एकूण + स्थिर शुल्क + समायोजन) वर टक्केवारी मोजली जाते\n6. अंतिम बिल: सर्व घटकांची बेरीज आणि अंतिम राउंडिंग\n\nसूचना: दर slabs.json वरून लोड केले जातात. हा फक्त अंदाज आहे, अधिकृत बिल नाही.",
     "msg.calculating": "गणना करत आहे...",
     "welcome.title": "मीटरमध्ये आपले स्वागत आहे",
     "welcome.subtitle": "तुमचा वीज बिल अंदाजक",
@@ -146,7 +173,32 @@ const translations = {
     "welcome.feature4.title": "ऑफलाइन काम करते",
     "welcome.feature4.desc": "पहिल्या लोड नंतर इंटरनेट आवश्यक नाही",
     "welcome.note": "हे फक्त ट्रॅकिंगसाठी अंदाजित बिल कॅल्क्युलेटर आहे. अधिकृत बिल नाही.",
-    "welcome.getStarted": "सुरू करा"
+    "welcome.getStarted": "सुरू करा",
+    "steps.readings": "रीडिंग द्या",
+    "steps.location": "जिल्हा निवडा",
+    "steps.calculate": "बिल काढा",
+    "trust.noData": "वैयक्तिक डेटा नाही",
+    "trust.local": "स्थानिक साठवण",
+    "trust.offline": "ऑफलाइन",
+    "result.emptyTitle": "तुमचा बिल अंदाज इथे दिसेल.",
+    "result.emptyDesc": "रीडिंग टाका आणि Calculate दाबा.",
+    "result.ready": "अंदाजित बिल तयार",
+    "analytics.title": "स्मार्ट विश्लेषण",
+    "analytics.subtitle": "तुमच्या वीज वापराच्या इतिहासावरून अंतर्दृष्टी",
+    "analytics.dailyCostLabel": "दैनंदिन खर्च अंदाज",
+    "analytics.dailyCostHint": "सरासरी मासिक वापरावर आधारित",
+    "analytics.tipLabel": "💡 बचतीची टिप",
+    "analytics.consumptionTitle": "वापराची पातळी",
+    "analytics.low": "कमी",
+    "analytics.medium": "मध्यम",
+    "analytics.high": "जास्त",
+    "analytics.chartTitle": "वीज वापर ट्रेंड",
+    "analytics.chartEmpty": "वापर ट्रेंड पाहण्यासाठी तुमचे बिल काढा.",
+    "analytics.historyTitle": "📋 वापर इतिहास",
+    "analytics.clearHistory": "साफ करा",
+    "analytics.historyEmpty": "अजून कोणता इतिहास नाही. पहिले बिल काढा.",
+    "analytics.exportBtn": "⬇️ वापर अहवाल डाउनलोड करा",
+    "analytics.exportHint": "तुमच्या शेवटच्या नोंदीचे PDF सारांश डाउनलोड करा."
   },
   hi: {
     "app.title": "मीटर",
@@ -179,7 +231,7 @@ const translations = {
     "result.totalHint": "स्लैब राशि + फिक्स्ड चार्ज.",
     "result.slabBreakdown": "स्लैब-वाइज विवरण",
     "result.fixedCharges": "फिक्स्ड चार्ज (यदि हो)",
-    "result.taxes": "कर और शुल्क",
+    "result.taxes": "अनुमानित सरकारी शुल्क (लगभग 20%)",
     "legal.privacyTitle": "गोपनीयता:",
     "legal.privacyText": "सभी गणनाएँ आपके डिवाइस पर होती हैं. डेटा केवल localStorage में स्टोर होता है.",
     "legal.disclaimerTitle": "अस्वीकरण:",
@@ -199,11 +251,11 @@ const translations = {
     "msg.enterValidReadings": "कृपया वैध रीडिंग दर्ज करें.",
     "msg.breakdownEmpty": "जिला + बिल मोड चुनकर “बिल निकालें” दबाएँ.",
     "msg.fixedCharge": "फिक्स्ड चार्ज",
-    "msg.totalTax": "कुल कर",
+    "msg.totalTax": "कुल अनुमानित शुल्क",
     "msg.slabSubtotal": "स्लैब उप-योग",
     "msg.estimatedNotOfficial": "अनुमानित बिल निकाला गया. यह आधिकारिक बिल नहीं है.",
     "about.title": "यह कैसे काम करता है",
-    "about.content": "यह कैलकुलेटर स्लैब-वाइज टैरिफ दरों का उपयोग करके आपके बिजली बिल का अनुमान लगाता है:\n1. उपयोग की गई यूनिट्स: वर्तमान रीडिंग − पिछला भुगतान रीडिंग\n2. स्लैब गणना: यूनिट्स को टैरिफ स्लैब में वितरित किया जाता है\n3. फिक्स्ड चार्ज: जिले और बिल मोड के आधार पर जोड़ा जाता है\n4. कर: (स्लैब कुल + फिक्स्ड चार्ज) पर प्रतिशत की गणना\n5. अंतिम बिल: सभी घटकों का योग\n\nनोट: दर slabs.json से लोड होते हैं. यह केवल एक अनुमान है, आधिकारिक बिल नहीं.",
+    "about.content": "यह कैलकुलेटर स्लैब-वाइज टैरिफ दरों का उपयोग करके आपके बिजली बिल का अनुमान लगाता है:\n1. उपयोग की गई यूनिट्स: वर्तमान रीडिंग − पिछला भुगतान रीडिंग\n2. स्लैब गणना: यूनिट्स को टैरिफ स्लैब में वितरित किया जाता है, प्रत्येक स्लैब को राउंड किया जाता है\n3. फिक्स्ड चार्ज: जिले और बिल मोड के आधार पर जोड़ा जाता है\n4. समायोजन शुल्क (FAC): यूनिट्स के आधार पर फ्यूल एडजस्टमेंट चार्ज जोड़ा जाता है\n5. कर: (स्लैब कुल + फिक्स्ड चार्ज + समायोजन) पर प्रतिशत की गणना\n6. अंतिम बिल: सभी घटकों का योग और अंतिम राउंडिंग\n\nनोट: दर slabs.json से लोड होते हैं. यह केवल एक अनुमान है, आधिकारिक बिल नहीं.",
     "msg.calculating": "गणना कर रहा है...",
     "welcome.title": "मीटर में आपका स्वागत है",
     "welcome.subtitle": "आपका बिजली बिल अनुमानक",
@@ -216,9 +268,72 @@ const translations = {
     "welcome.feature4.title": "ऑफलाइन काम करता है",
     "welcome.feature4.desc": "पहले लोड के बाद इंटरनेट की आवश्यकता नहीं",
     "welcome.note": "यह केवल ट्रैकिंग के लिए एक अनुमानित बिल कैलकुलेटर है. आधिकारिक बिल नहीं.",
-    "welcome.getStarted": "शुरू करें"
+    "welcome.getStarted": "शुरू करें",
+    "steps.readings": "रीडिंग दर्ज करें",
+    "steps.location": "क्षेत्र चुनें",
+    "steps.calculate": "बिल निकालें",
+    "trust.noData": "व्यक्तिगत डेटा नहीं",
+    "trust.local": "स्थानीय संग्रहण",
+    "trust.offline": "ऑफलाइन",
+    "result.emptyTitle": "आपका बिल अनुमान यहाँ दिखेगा.",
+    "result.emptyDesc": "रीडिंग दर्ज करें और Calculate दबाएँ.",
+    "result.ready": "अनुमानित बिल तैयार",
+    "analytics.title": "स्मार्ट विश्लेषण",
+    "analytics.subtitle": "आपके बिजली उपयोग इतिहास से अंतर्दृष्टि",
+    "analytics.dailyCostLabel": "अनुमानित दैनिक खर्च",
+    "analytics.dailyCostHint": "औसत मासिक उपयोग के आधार पर",
+    "analytics.tipLabel": "💡 बचत टिप",
+    "analytics.consumptionTitle": "उपभोग स्तर",
+    "analytics.low": "कम",
+    "analytics.medium": "मध्यम",
+    "analytics.high": "अधिक",
+    "analytics.chartTitle": "बिजली उपयोग यरुची प्रवृत्ति",
+    "analytics.chartEmpty": "उपयोग प्रवृत्ति देखने के लिए अपना बिल निकालें.",
+    "analytics.historyTitle": "📋 उपयोग इतिहास",
+    "analytics.clearHistory": "साफ़ करें",
+    "analytics.historyEmpty": "अभी कोई इतिहास नहीं. पहला बिल निकालें.",
+    "analytics.exportBtn": "⬇️ उपयोग रिपोर्ट डाउनलोड करें",
+    "analytics.exportHint": "आपके नवीनतम रिकॉर्ड का PDF सारांश डाउनलोड करें."
   }
 };
+
+// Add new keys for Smart Meter Reading Assistant (defaulting to En for now to ensure keys exist)
+Object.keys(translations).forEach(lang => {
+  const t = translations[lang];
+  // English defaults
+  if (!t["inputs.howToRead"]) t["inputs.howToRead"] = "How to find meter reading?";
+  if (!t["inputs.readingTip"]) t["inputs.readingTip"] = "Tip: Wait a few seconds until the meter shows kWh reading.";
+  if (!t["modal.title"]) t["modal.title"] = "How to Read Your Electricity Meter";
+  if (!t["modal.step1"]) t["modal.step1"] = "Wait until meter display shows \"kWh\" or \"Units\"";
+  if (!t["modal.step2"]) t["modal.step2"] = "Enter only the number shown with kWh";
+  if (!t["modal.step3"]) t["modal.step3"] = "Ignore voltage (V), current (A), or other changing values";
+  if (!t["modal.step4"]) t["modal.step4"] = "Ignore decimal/red digits";
+  if (!t["msg.readingHigh"]) t["msg.readingHigh"] = "Reading looks unusually high. Please verify.";
+});
+
+// Marathi Overrides
+if (translations.mr) {
+  translations.mr["inputs.howToRead"] = "मीटर रीडिंग कसे ओळखावे?";
+  translations.mr["inputs.readingTip"] = "टीप: मीटरवर kWh रीडिंग येईपर्यंत काही सेकंद थांबा.";
+  translations.mr["modal.title"] = "तुमचे वीज मीटर कसे वाचावे";
+  translations.mr["modal.step1"] = "मीटर डिस्प्लेवर \"kWh\" किंवा \"Units\" येईपर्यंत थांबा";
+  translations.mr["modal.step2"] = "फक्त kWh सह दिसणारा नंबर टाका";
+  translations.mr["modal.step3"] = "व्होल्टेज (V), करंट (A) किंवा इतर बदलणारे आकडे टाळू नका";
+  translations.mr["modal.step4"] = "लाल अंक किंवा दशांश (point) नंतरचे अंक टाळू नका";
+  translations.mr["msg.readingHigh"] = "रीडिंग खूप जास्त वाटत आहे. कृपया तपासा.";
+}
+
+// Hindi Overrides
+if (translations.hi) {
+  translations.hi["inputs.howToRead"] = "मीटर रीडिंग कैसे पहचानें?";
+  translations.hi["inputs.readingTip"] = "टिप: मीटर पर kWh रीडिंग आने तक कुछ सेकंड रुकें.";
+  translations.hi["modal.title"] = "अपना बिजली मीटर कैसे पढ़ें";
+  translations.hi["modal.step1"] = "मीटर डिस्प्ले पर \"kWh\" या \"Units\" आने तक प्रतीक्षा करें";
+  translations.hi["modal.step2"] = "केवल kWh के साथ दिखाई देने वाला नंबर दर्ज करें";
+  translations.hi["modal.step3"] = "वोल्टेज (V), करंट (A) या अन्य बदलती संख्याएँ न लिखें";
+  translations.hi["modal.step4"] = "दशमलव (point) या लाल अंकों को छोड़ दें";
+  translations.hi["msg.readingHigh"] = "रीडिंग असामान्य रूप से उच्च लग रही है. कृपया जाँच करें.";
+}
 
 function t(key) {
   const lang = localStorage.getItem(LANG_KEY) || "en";
@@ -240,7 +355,7 @@ function applyTranslations(lang) {
       const lines = text.split("\n").filter(l => l.trim());
       let html = "";
       let inList = false;
-      
+
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
         if (line.match(/^\d+\./)) {
@@ -291,6 +406,7 @@ const els = {
   slabBreakdown: () => document.getElementById("slabBreakdown"),
   fixedCharges: () => document.getElementById("fixedCharges"),
   taxesAndDuties: () => document.getElementById("taxesAndDuties"),
+  adjustmentCharge: () => document.getElementById("adjustmentCharge"),
   message: () => document.getElementById("resultMessage")
 };
 
@@ -302,10 +418,10 @@ const fmtNumber = (n) =>
 const fmtMoney = (n) =>
   typeof n === "number" && Number.isFinite(n)
     ? new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 2
-      }).format(n)
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(n)
     : "—";
 
 function setMessage(type, text) {
@@ -486,8 +602,20 @@ function validateInputsLive() {
           ? t("msg.currentLessThanLast")
           : t("msg.currentMustBeGreater")
       );
+    } else if (unitsUsed > 5000) {
+      // Warning for unusually high reading
+      setMessage("warning", t("msg.readingHigh"));
+    } else {
+      // Clear message if it was a warning or stale result
+      // We only clear if there's no other blocking error (which setFieldError handles)
+      // This also has the benefit of clearing stale results when inputs change.
+      setMessage("", "");
     }
   }
+  // Update dynamic input border states & live units
+  updateInputStates();
+  updateLiveUnits();
+  updateStepBar();
 }
 
 function updateCalcDisabled() {
@@ -519,7 +647,7 @@ function calculateSlabs(slabs, units) {
     const span = end - start + 1;
     const inSlab = Math.max(0, Math.min(remaining, span));
     if (inSlab > 0) {
-      const amount = Number((inSlab * slab.rate).toFixed(2));
+      const amount = Math.round(inSlab * slab.rate);
       rows.push({
         from: start,
         to: slab.to,
@@ -596,23 +724,32 @@ function renderFixedCharge(fixedCharge) {
   `;
 }
 
-function calculateTaxes(taxesAndSurcharges, baseAmount) {
-  const taxes = Array.isArray(taxesAndSurcharges) ? taxesAndSurcharges : [];
-  const rows = [];
-  for (const t of taxes) {
-    if (!t || t.type !== "percentage") continue;
-    const pct = Number(t.value);
-    if (!Number.isFinite(pct)) continue;
-    const amount = Number(((baseAmount * pct) / 100).toFixed(2));
-    rows.push({
-      label: String(t.label || "Tax"),
-      type: "percentage",
-      value: pct,
-      amount
-    });
+function renderAdjustmentCharge(adjustment) {
+  const adj = Number(adjustment) || 0;
+  const el = els.adjustmentCharge();
+  if (!el) return;
+  if (adj <= 0) {
+    el.className = "emptyState";
+    el.textContent = "—";
+    return;
   }
-  const taxTotal = Number(rows.reduce((acc, r) => acc + r.amount, 0).toFixed(2));
-  return { rows, taxTotal };
+  el.className = "";
+  el.innerHTML = `
+    <ul class="list">
+      <li><span>Adjustment Charge (FAC)</span><span>₹ ${fmtNumber(adj)}</span></li>
+    </ul>
+  `;
+}
+
+function calculateTaxes(taxesAndSurcharges, subtotal) {
+  const govtCharges = Math.round(subtotal * 0.20);
+  const rows = [{
+    label: "Electricity Duty, GST & Reg. Charges",
+    type: "combined",
+    value: 20,
+    amount: govtCharges
+  }];
+  return { rows, taxTotal: govtCharges };
 }
 
 function renderTaxes(taxRows, taxTotal) {
@@ -627,8 +764,8 @@ function renderTaxes(taxRows, taxTotal) {
   el.innerHTML = `
     <ul class="list">
       ${taxRows
-        .map((t) => `<li><span>${t.label}</span><span>₹ ${fmtNumber(t.amount)}</span></li>`)
-        .join("")}
+      .map((t) => `<li><span>${t.label}</span><span>₹ ${fmtNumber(t.amount)}</span></li>`)
+      .join("")}
       <li class="listTotal"><span>${t("msg.totalTax")}</span><span>₹ ${fmtNumber(taxTotal)}</span></li>
     </ul>
   `;
@@ -661,12 +798,30 @@ function resetUI() {
   els.slabBreakdown().textContent = "Enter readings and select a district + bill mode to see the slab structure.";
   els.fixedCharges().className = "emptyState";
   els.fixedCharges().textContent = "—";
+  if (els.adjustmentCharge()) {
+    els.adjustmentCharge().className = "emptyState";
+    els.adjustmentCharge().textContent = "—";
+  }
   els.taxesAndDuties().className = "emptyState";
   els.taxesAndDuties().textContent = "—";
   setMessage("", "");
   localStorage.removeItem(STORAGE_KEY);
   updateMeta({ district: "—", provider: "—", billMode: "—" });
+  // Clear dynamic input border state classes
+  els.lastPaid().classList.remove("input-valid", "input-error", "input-warning");
+  els.current().classList.remove("input-valid", "input-error", "input-warning");
+  // Reset live units widget
+  const liveUnitsEl = document.getElementById("liveUnits");
+  if (liveUnitsEl) { liveUnitsEl.hidden = true; liveUnitsEl.textContent = ""; }
+  // Collapse inline guide
+  const guideToggle = document.getElementById("inlineGuideToggle");
+  const guideBody = document.getElementById("inlineGuideBody");
+  if (guideToggle) guideToggle.setAttribute("aria-expanded", "false");
+  if (guideBody) guideBody.hidden = true;
+  // Reset result section to empty state
+  showResultEmpty();
   updateCalcDisabled();
+  updateStepBar();
 }
 
 function showWelcomeScreen() {
@@ -695,10 +850,219 @@ function checkWelcomeScreen() {
   }
 }
 
+function initModal() {
+  const modal = document.getElementById("readingModal");
+  const helpLink = document.getElementById("helpLink");
+  const closeBtn = document.getElementById("modalClose");
+  const overlay = document.getElementById("modalOverlay");
+
+  if (!modal || !helpLink || !closeBtn || !overlay) return;
+
+  const open = () => {
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+  };
+  const close = () => {
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  };
+
+  helpLink.addEventListener("click", open);
+  closeBtn.addEventListener("click", close);
+  overlay.addEventListener("click", close);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) close();
+  });
+}
+
+// ============================================================
+// UX HELPERS — live units, step bar, input states, inline guide
+// ============================================================
+
+function updateInputStates() {
+  const lastRaw = els.lastPaid().value.trim();
+  const currRaw = els.current().value.trim();
+  const last = parseNonNegative(lastRaw);
+  const curr = parseNonNegative(currRaw);
+
+  // Last Paid input
+  const lastInput = els.lastPaid();
+  lastInput.classList.remove("input-valid", "input-error");
+  if (lastRaw) {
+    lastInput.classList.add(last.ok ? "input-valid" : "input-error");
+  }
+
+  // Current input
+  const currInput = els.current();
+  currInput.classList.remove("input-valid", "input-warning", "input-error");
+  if (currRaw && curr.ok) {
+    if (last.ok) {
+      const diff = curr.value - last.value;
+      if (diff < 0) currInput.classList.add("input-error");
+      else if (diff > 5000) currInput.classList.add("input-warning");
+      else if (diff > 0) currInput.classList.add("input-valid");
+    } else {
+      currInput.classList.add("input-valid");
+    }
+  } else if (currRaw && !curr.ok) {
+    currInput.classList.add("input-error");
+  }
+}
+
+function updateLiveUnits() {
+  const liveEl = document.getElementById("liveUnits");
+  if (!liveEl) return;
+  const lastRaw = els.lastPaid().value.trim();
+  const currRaw = els.current().value.trim();
+  const last = parseNonNegative(lastRaw);
+  const curr = parseNonNegative(currRaw);
+
+  if (last.ok && curr.ok && lastRaw && currRaw) {
+    const diff = curr.value - last.value;
+    liveEl.hidden = false;
+    liveEl.classList.remove("valid", "warning", "error");
+    if (diff < 0) {
+      liveEl.textContent = `⚠️ Units: ${Math.abs(diff).toFixed(2)} below last reading`;
+      liveEl.classList.add("error");
+    } else if (diff > 5000) {
+      liveEl.textContent = `⚠️ Units used so far: ${diff.toFixed(2)} units (unusually high)`;
+      liveEl.classList.add("warning");
+    } else {
+      liveEl.textContent = `✅ Units used so far: ${diff.toFixed(2)} units`;
+      liveEl.classList.add("valid");
+    }
+  } else {
+    liveEl.hidden = true;
+    liveEl.textContent = "";
+  }
+}
+
+function updateStepBar() {
+  const lastRaw = els.lastPaid().value.trim();
+  const currRaw = els.current().value.trim();
+  const districtId = els.districtSelect().value;
+  const billMode = els.billModeSelect().value;
+  const last = parseNonNegative(lastRaw);
+  const curr = parseNonNegative(currRaw);
+
+  const readingsDone = last.ok && curr.ok && lastRaw && currRaw && (curr.value - last.value) > 0;
+  const locationDone = !!districtId && !!billMode;
+  const calcDone = !els.calcBtn().disabled && locationDone && readingsDone;
+
+  const s1 = document.getElementById("step1");
+  const s2 = document.getElementById("step2");
+  const s3 = document.getElementById("step3");
+  const connectors = document.querySelectorAll(".stepConnector");
+
+  if (!s1 || !s2 || !s3) return;
+
+  // Step 1: readings
+  s1.classList.toggle("done", readingsDone);
+  s1.classList.toggle("active", !readingsDone);
+
+  // Step 2: location
+  s2.classList.toggle("done", locationDone && readingsDone);
+  s2.classList.toggle("active", readingsDone && !locationDone);
+
+  // Step 3: calculate
+  s3.classList.toggle("done", calcDone && locationDone && readingsDone);
+  s3.classList.toggle("active", readingsDone && locationDone && !calcDone);
+
+  // connectors
+  if (connectors[0]) connectors[0].classList.toggle("done", readingsDone);
+  if (connectors[1]) connectors[1].classList.toggle("done", locationDone && readingsDone);
+}
+
+function showResultFilled() {
+  const empty = document.getElementById("emptyResultState");
+  const filled = document.getElementById("resultFilled");
+  if (empty) empty.hidden = true;
+  if (filled) filled.hidden = false;
+}
+
+function showResultEmpty() {
+  const empty = document.getElementById("emptyResultState");
+  const filled = document.getElementById("resultFilled");
+  if (empty) empty.hidden = false;
+  if (filled) filled.hidden = true;
+}
+
+function initUX() {
+  // Inline guide toggle
+  const toggle = document.getElementById("inlineGuideToggle");
+  const body = document.getElementById("inlineGuideBody");
+  if (toggle && body) {
+    toggle.addEventListener("click", () => {
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!isOpen));
+      body.hidden = isOpen;
+    });
+  }
+}
+
+// -----------------------------------------------------------
+// INSTRUCTION POPUP — shown once after first Welcome dismiss
+// -----------------------------------------------------------
+function showInstructionPopup() {
+  const popup = document.getElementById("instructionPopup");
+  if (popup) {
+    popup.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function hideInstructionPopup() {
+  const popup = document.getElementById("instructionPopup");
+  if (popup) {
+    popup.hidden = true;
+    document.body.style.overflow = "";
+  }
+  localStorage.setItem(INSTRUCTION_KEY, "1");
+}
+
+function initInstructionPopup() {
+  const gotItBtn = document.getElementById("instructionGotIt");
+  if (gotItBtn) {
+    gotItBtn.addEventListener("click", hideInstructionPopup);
+  }
+  // Close on backdrop click
+  const popup = document.getElementById("instructionPopup");
+  if (popup) {
+    popup.addEventListener("click", (e) => {
+      if (e.target === popup) hideInstructionPopup();
+    });
+  }
+  // Close on Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && popup && !popup.hidden) hideInstructionPopup();
+  });
+}
+
+// -----------------------------------------------------------
+// DISCLAIMER BANNER — dismissible per-session notice
+// -----------------------------------------------------------
+function initDisclaimerBanner() {
+  const closeBtn = document.getElementById("disclaimerBannerClose");
+  const banner = document.getElementById("disclaimerBanner");
+  if (closeBtn && banner) {
+    closeBtn.addEventListener("click", () => {
+      banner.style.maxHeight = banner.scrollHeight + "px";
+      requestAnimationFrame(() => {
+        banner.classList.add("dismissing");
+        setTimeout(() => { banner.hidden = true; }, 350);
+      });
+    });
+  }
+}
+
 async function main() {
+  initModal();
+  initUX();
+  initInstructionPopup();
+  initDisclaimerBanner();
   // Check welcome screen FIRST, before anything else loads
   checkWelcomeScreen();
-  
+
   const data = await loadSlabsJson();
   const langSelect = document.getElementById("langSelect");
   const initialLang = localStorage.getItem(LANG_KEY) || "en";
@@ -711,13 +1075,17 @@ async function main() {
     });
   }
   applyTranslations(langSelect?.value || initialLang);
-  
+
   const welcomeBtn = document.getElementById("welcomeGetStarted");
   const showWelcomeBtn = document.getElementById("showWelcomeBtn");
 
   if (welcomeBtn) {
     welcomeBtn.addEventListener("click", () => {
       hideWelcomeScreen();
+      // Show instruction popup only on first visit
+      if (!localStorage.getItem(INSTRUCTION_KEY)) {
+        showInstructionPopup();
+      }
     });
   }
 
@@ -837,14 +1205,23 @@ async function main() {
       }
 
       const breakdown = calculateSlabs(modeData.slabs || [], val.unitsUsed);
-      const slabTotal = breakdown.reduce((acc, r) => acc + r.amount, 0);
-      const fixed = Number(modeData.fixedCharge) || 0;
-      const baseAmount = Number((slabTotal + fixed).toFixed(2));
-      const { rows: taxRows, taxTotal } = calculateTaxes(modeData.taxesAndSurcharges, baseAmount);
-      const total = Number((baseAmount + taxTotal).toFixed(2));
+      const slabTotal = breakdown.reduce((acc, r) => acc + r.amount, 0); // Step 1
+      const fixed = Number(modeData.fixedCharge) || 0; // Step 2
+
+      // Step 3: Fuel Adjustment Charge (FAC)
+      const adjustmentCharge = Math.round(val.unitsUsed * 0.07);
+
+      const subtotal = slabTotal + fixed + adjustmentCharge;
+
+      // Step 4: Apply Taxes on subtotal
+      const { rows: taxRows, taxTotal } = calculateTaxes(modeData.taxesAndSurcharges, subtotal);
+
+      // Step 5: Final rounding
+      const total = Math.round(subtotal + taxTotal);
 
       renderBreakdown(breakdown);
       renderFixedCharge(fixed);
+      renderAdjustmentCharge(adjustmentCharge);
       renderTaxes(taxRows, taxTotal);
       updateResults(val.unitsUsed, total);
       updateMeta({
@@ -853,14 +1230,47 @@ async function main() {
         billMode: val.billMode
       });
       setMessage("success", t("msg.estimatedNotOfficial"));
-      
+      showResultFilled();
+
+      // F1-F6, F9: push entry to analytics module
+      if (typeof updateAnalytics === 'function') {
+        updateAnalytics({
+          date: new Date().toISOString(),
+          district: district.label,
+          billMode: val.billMode,
+          unitsUsed: val.unitsUsed,
+          estimatedBill: total
+        });
+      }
+
+      // Save full bill data for bill.html
+      const billData = {
+        date: new Date().toISOString(),
+        district: district.label,
+        provider: district.provider || "—",
+        billMode: val.billMode,
+        lastReading: val.last,
+        currentReading: val.curr,
+        unitsUsed: val.unitsUsed,
+        estimatedBill: total,
+        slabTotal: slabTotal,
+        fixedCharge: fixed,
+        adjustmentCharge: adjustmentCharge,
+        taxTotal: taxTotal,
+        govtCharges: taxTotal,
+        taxRows: taxRows,
+        slabBreakdown: breakdown
+      };
+      localStorage.setItem(LAST_BILL_KEY, JSON.stringify(billData));
+
       // Restore button
       calcBtn.disabled = false;
       calcBtn.textContent = originalText;
       updateCalcDisabled();
-      
-      // Smooth scroll to results
-      document.querySelector('[aria-label="Results"]')?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      updateStepBar();
+
+      // Redirect to Bill Page
+      window.location.href = 'bill.html';
     }, 100);
   });
 

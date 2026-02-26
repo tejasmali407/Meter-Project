@@ -1,152 +1,332 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-    <meta name="description" content="Meter — Electricity Bill Tracker (client-side, offline-friendly)" />
-    <title>Meter — Electricity Bill Tracker</title>
-    <link rel="icon" href="/img/fab-icon.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <!-- Welcome Screen -->
-    <div id="welcomeScreen" class="welcomeScreen" hidden>
-      <div class="welcomeContent">
-        <div class="welcomeIcon">⚡</div>
-        <h1 class="welcomeTitle" data-i18n="welcome.title">Welcome to Meter</h1>
-        <p class="welcomeSubtitle" data-i18n="welcome.subtitle">Your Electricity Bill Estimator</p>
-        
-        <div class="welcomeFeatures">
-          <div class="welcomeFeature">
-            <span class="featureIcon">📊</span>
-            <div>
-              <strong data-i18n="welcome.feature1.title">Slab-wise Calculation</strong>
-              <p data-i18n="welcome.feature1.desc">Accurate bill estimation using tariff slabs</p>
-            </div>
-          </div>
-          <div class="welcomeFeature">
-            <span class="featureIcon">🔒</span>
-            <div>
-              <strong data-i18n="welcome.feature2.title">100% Private</strong>
-              <p data-i18n="welcome.feature2.desc">All calculations happen on your device</p>
-            </div>
-          </div>
-          <div class="welcomeFeature">
-            <span class="featureIcon">🌐</span>
-            <div>
-              <strong data-i18n="welcome.feature3.title">Multi-language</strong>
-              <p data-i18n="welcome.feature3.desc">Available in English, Marathi & Hindi</p>
-            </div>
-          </div>
-          <div class="welcomeFeature">
-            <span class="featureIcon">📱</span>
-            <div>
-              <strong data-i18n="welcome.feature4.title">Works Offline</strong>
-              <p data-i18n="welcome.feature4.desc">No internet required after first load</p>
-            </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <meta name="description" content="Meter — Electricity Bill Tracker (client-side, offline-friendly)" />
+  <title>Meter — Electricity Bill Tracker</title>
+  <link rel="icon" href="/img/fab-icon.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+  </style>
+  <!-- Analytics CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+  <!-- Welcome Screen -->
+  <div id="welcomeScreen" class="welcomeScreen" hidden>
+    <div class="welcomeContent">
+      <div class="welcomeIcon">⚡</div>
+      <h1 class="welcomeTitle" data-i18n="welcome.title">Welcome to Meter</h1>
+      <p class="welcomeSubtitle" data-i18n="welcome.subtitle">Your Electricity Bill Estimator</p>
+
+      <div class="welcomeFeatures">
+        <div class="welcomeFeature">
+          <span class="featureIcon">📊</span>
+          <div>
+            <strong data-i18n="welcome.feature1.title">Slab-wise Calculation</strong>
+            <p data-i18n="welcome.feature1.desc">Accurate bill estimation using tariff slabs</p>
           </div>
         </div>
-
-        <div class="welcomeNote">
-          <p data-i18n="welcome.note">This is an estimated bill calculator for tracking purposes only. Not an official bill.</p>
+        <div class="welcomeFeature">
+          <span class="featureIcon">🔒</span>
+          <div>
+            <strong data-i18n="welcome.feature2.title">100% Private</strong>
+            <p data-i18n="welcome.feature2.desc">All calculations happen on your device</p>
+          </div>
         </div>
-
-        <button class="primaryBtn welcomeBtn" id="welcomeGetStarted" data-i18n="welcome.getStarted">
-          Get Started
-        </button>
+        <div class="welcomeFeature">
+          <span class="featureIcon">🌐</span>
+          <div>
+            <strong data-i18n="welcome.feature3.title">Multi-language</strong>
+            <p data-i18n="welcome.feature3.desc">Available in English, Marathi &amp; Hindi</p>
+          </div>
+        </div>
+        <div class="welcomeFeature">
+          <span class="featureIcon">📱</span>
+          <div>
+            <strong data-i18n="welcome.feature4.title">Works Offline</strong>
+            <p data-i18n="welcome.feature4.desc">No internet required after first load</p>
+          </div>
+        </div>
       </div>
+
+      <div class="welcomeNote">
+        <p data-i18n="welcome.note">This is an estimated bill calculator for tracking purposes only. Not an official
+          bill.</p>
+      </div>
+
+      <button class="primaryBtn welcomeBtn" id="welcomeGetStarted" data-i18n="welcome.getStarted">
+        Get Started
+      </button>
+    </div>
+  </div>
+
+  <!-- Instruction Popup (shown once after first Welcome dismiss) -->
+  <div id="instructionPopup" class="instructionPopup" hidden aria-modal="true" role="dialog"
+    aria-label="How to use Meter">
+    <div class="instructionContent">
+      <div class="instructionHeader">
+        <span class="instructionHeaderIcon">📖</span>
+        <h2 class="instructionTitle">Quick Guide</h2>
+      </div>
+
+      <ul class="instructionList">
+        <li>
+          <span class="instructionIcon">🔢</span>
+          <div>
+            <strong>How to read your meter</strong>
+            <p>Wait for the display to cycle to <em>kWh</em>. That number is your meter reading. Ignore Voltage (V) and
+              Current (A) screens.</p>
+          </div>
+        </li>
+        <li>
+          <span class="instructionIcon">✏️</span>
+          <div>
+            <strong>How to enter readings</strong>
+            <p>Enter the kWh value from your <em>last paid bill</em> in "Last Paid Reading", then enter today's kWh
+              reading in "Current Reading".</p>
+          </div>
+        </li>
+        <li>
+          <span class="instructionIcon">📍</span>
+          <div>
+            <strong>Select your district &amp; bill mode</strong>
+            <p>Choose your district to auto-fill your electricity provider, then select Residential or Commercial.</p>
+          </div>
+        </li>
+        <li class="instructionDisclaimer">
+          <span class="instructionIcon">⚠️</span>
+          <div>
+            <strong>Educational purpose only</strong>
+            <p>This app generates an <em>estimated</em> bill for tracking &amp; learning. It is <strong>not an official
+                bill</strong> and is not affiliated with MSEDCL or any electricity board.</p>
+          </div>
+        </li>
+      </ul>
+
+      <button class="primaryBtn instructionGotItBtn" id="instructionGotIt">✓ Got It, Let's Start!</button>
+    </div>
+  </div>
+
+  <main class="app" aria-label="Meter app">
+    <!-- Disclaimer Notice Banner -->
+    <div id="disclaimerBanner" class="disclaimerBanner" role="alert">
+      <span class="disclaimerBannerText">⚠️ This is <strong>NOT</strong> an official electricity bill. For educational
+        and demonstration purposes only.</span>
+      <button class="disclaimerBannerClose" id="disclaimerBannerClose" aria-label="Dismiss notice"
+        title="Dismiss">✕</button>
     </div>
 
-    <main class="app" aria-label="Meter app">
-      <header class="header">
-        <div>
-          <h1 class="title" data-i18n="app.title">Meter</h1>
-          <p class="subtitle" data-i18n="app.subtitle">Electricity Bill Estimator (estimated)</p>
+    <header class="header">
+      <div>
+        <h1 class="title" data-i18n="app.title">Meter</h1>
+        <p class="subtitle" data-i18n="app.subtitle">Electricity Bill Estimator (estimated)</p>
+      </div>
+      <div class="headerRight">
+        <div class="langWrap">
+          <label class="langLabel" for="langSelect" data-i18n="app.language">Language</label>
+          <select id="langSelect" class="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="mr">मराठी</option>
+            <option value="hi">हिन्दी</option>
+          </select>
         </div>
-        <div class="headerRight">
-          <div class="langWrap">
-            <label class="langLabel" for="langSelect" data-i18n="app.language">Language</label>
-            <select id="langSelect" class="langSelect" aria-label="Language">
-              <option value="en">English</option>
-              <option value="mr">मराठी</option>
-              <option value="hi">हिन्दी</option>
-            </select>
-          </div>
-          <p class="badge" aria-label="Offline friendly" data-i18n="app.clientSide">Client-side</p>
-          <button class="welcomeToggle" id="showWelcomeBtn" title="Show welcome screen" aria-label="Show welcome screen">
-            ℹ️
-          </button>
-        </div>
-      </header>
+        <p class="badge" aria-label="Offline friendly" data-i18n="app.clientSide">Client-side</p>
+        <button class="welcomeToggle" id="showWelcomeBtn" title="Show welcome screen" aria-label="Show welcome screen">
+          ℹ️
+        </button>
+      </div>
+    </header>
 
-      <section class="card">
-        <h2 class="cardTitle" data-i18n="inputs.title">Inputs</h2>
+    <!-- Step Progress Bar -->
+    <nav class="stepBar" aria-label="Progress steps">
+      <div class="stepItem" id="step1" data-step="1">
+        <div class="stepCircle">①</div>
+        <span class="stepLabel" data-i18n="steps.readings">Enter Readings</span>
+      </div>
+      <div class="stepConnector"></div>
+      <div class="stepItem" id="step2" data-step="2">
+        <div class="stepCircle">②</div>
+        <span class="stepLabel" data-i18n="steps.location">Select Location</span>
+      </div>
+      <div class="stepConnector"></div>
+      <div class="stepItem" id="step3" data-step="3">
+        <div class="stepCircle">③</div>
+        <span class="stepLabel" data-i18n="steps.calculate">Calculate Bill</span>
+      </div>
+    </nav>
 
-        <form id="meterForm" novalidate>
-          <div class="field">
+    <section class="card">
+      <h2 class="cardTitle" data-i18n="inputs.title">Inputs</h2>
+
+      <form id="meterForm" novalidate>
+        <!-- Last Paid Reading -->
+        <div class="field">
+          <div class="labelRow">
             <label for="lastPaidReading" data-i18n="inputs.lastPaid">Last Paid Meter Reading</label>
-            <input id="lastPaidReading" name="lastPaidReading" type="number" inputmode="decimal" min="0" step="0.01"
-              placeholder="e.g., 12560"
-              autocomplete="off"
-              required
-            />
-            <div class="fieldHelp" data-i18n="inputs.lastPaidHelp">From your previous bill.</div>
-            <div class="fieldError" id="lastPaidReadingError" aria-live="polite"></div>
+            <button type="button" class="tooltipBtn" aria-label="Help: Last paid reading"
+              data-tooltip="Enter the kWh value from your last electricity bill.">ℹ️</button>
           </div>
+          <input id="lastPaidReading" name="lastPaidReading" type="number" inputmode="decimal" min="0" step="0.01"
+            placeholder="e.g., 12560" autocomplete="off" required />
+          <div class="fieldHelp" data-i18n="inputs.lastPaidHelp">From your previous bill.</div>
+          <div class="fieldError" id="lastPaidReadingError" aria-live="polite"></div>
+        </div>
 
-          <div class="field">
+        <!-- Current Reading -->
+        <div class="field">
+          <div class="labelRow">
             <label for="currentReading" data-i18n="inputs.current">Current Meter Reading</label>
-            <input id="currentReading" name="currentReading" type="number" inputmode="decimal" min="0" step="0.01"
-              placeholder="e.g., 12610"
-              autocomplete="off"
-              required
-            />
-            <div class="fieldHelp" data-i18n="inputs.currentHelp">Today’s meter value.</div>
-            <div class="fieldError" id="currentReadingError" aria-live="polite"></div>
+            <button type="button" class="tooltipBtn" aria-label="Help: Current reading"
+              data-tooltip="Enter the number shown next to kWh on your meter display.">ℹ️</button>
           </div>
+          <input id="currentReading" name="currentReading" type="number" inputmode="decimal" min="0" step="0.01"
+            placeholder="e.g., 12610" autocomplete="off" required />
+          <div class="fieldHelp" data-i18n="inputs.currentHelp">Today's meter value.</div>
+          <div class="fieldError" id="currentReadingError" aria-live="polite"></div>
 
-          <div class="field">
-            <label for="districtSelect" data-i18n="inputs.district">District</label>
-            <select id="districtSelect" name="districtSelect" required>
-              <option value="" selected disabled data-i18n="inputs.selectDistrict">Select your district</option>
-            </select>
-            <div class="fieldHelp" data-i18n="inputs.districtHelp">Used to load provider and slab rates.</div>
-            <div class="fieldError" id="districtSelectError" aria-live="polite"></div>
-          </div>
+          <!-- Live units feedback -->
+          <div class="liveUnits" id="liveUnits" hidden aria-live="polite"></div>
 
-          <div class="field">
-            <label for="billModeSelect" data-i18n="inputs.billMode">Bill Mode</label>
-            <select id="billModeSelect" name="billModeSelect" required disabled>
-              <option value="" selected disabled data-i18n="inputs.selectBillMode">Select bill mode</option>
-              <option value="residential" data-i18n="inputs.residential">Residential</option>
-              <option value="commercial" data-i18n="inputs.commercial">Commercial</option>
-            </select>
-            <div class="fieldHelp" data-i18n="inputs.billModeHelp">Choose tariff type for selected district.</div>
-            <div class="fieldError" id="billModeSelectError" aria-live="polite"></div>
-          </div>
-
-          <div class="field">
-            <label for="providerText" data-i18n="inputs.provider">Provider</label>
-            <input id="providerText" name="providerText" type="text" placeholder="Auto-filled" disabled />
-            <div class="fieldHelp" data-i18n="inputs.providerHelp">Auto-filled when you choose a district.</div>
-          </div>
-
-          <div class="actions">
-            <button type="submit" class="primaryBtn" id="calculateBtn" data-i18n="actions.calculate">
-              Calculate Bill
+          <!-- Inline Meter Guide (collapsible) -->
+          <div class="inlineGuide">
+            <button type="button" class="inlineGuideToggle" id="inlineGuideToggle" aria-expanded="false">
+              <span class="inlineGuideIcon">❓</span>
+              <span data-i18n="inputs.howToRead">How to find meter reading?</span>
+              <span class="inlineGuideChevron" aria-hidden="true">▼</span>
             </button>
-            <button type="button" class="secondaryBtn" id="resetBtn" data-i18n="actions.reset">Reset</button>
+            <div class="inlineGuideBody" id="inlineGuideBody" hidden>
+              <p class="inlineGuideTip" data-i18n="inputs.readingTip">Tip: Wait a few seconds until the meter shows kWh.
+              </p>
+              <!-- Meter SVG Illustration -->
+              <div class="meterIllustration">
+                <div class="meterDevice">
+                  <div class="meterDeviceTop">
+                    <span class="meterDeviceLabel">⚡ Digital Electricity Meter</span>
+                  </div>
+                  <div class="meterRows">
+                    <div class="meterRow meterRow--bad">
+                      <div class="meterScreen">
+                        <span class="meterDigits">230</span>
+                        <span class="meterUnit">V</span>
+                      </div>
+                      <div class="meterRowInfo">
+                        <span class="meterRowStatus bad">✗</span>
+                        <div>
+                          <div class="meterRowTitle">Voltage</div>
+                          <div class="meterRowDesc">Ignore this</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="meterRow meterRow--bad">
+                      <div class="meterScreen">
+                        <span class="meterDigits">5.3</span>
+                        <span class="meterUnit">A</span>
+                      </div>
+                      <div class="meterRowInfo">
+                        <span class="meterRowStatus bad">✗</span>
+                        <div>
+                          <div class="meterRowTitle">Current</div>
+                          <div class="meterRowDesc">Ignore this</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="meterRow meterRow--good">
+                      <div class="meterScreen meterScreen--active">
+                        <img src="img/meater reading.jpeg" alt="Your meter kWh screen" class="activeIndicator" />
+                      </div>
+                      <div class="meterRowInfo">
+                        <span class="meterRowStatus good">✓</span>
+                        <div>
+                          <div class="meterRowTitle">Your Reading</div>
+                          <div class="meterRowDesc">Enter this number</div>
+                        </div>
+                      </div>
+                      <span class="meterRowBadge" data-i18n="inputs.findThis">Find this</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </form>
-      </section>
+        </div>
 
-      <section class="card cardAbout" id="aboutSection">
-        <h2 class="cardTitle" data-i18n="about.title">How It Works</h2>
-        <div class="aboutContent" data-i18n="about.content"></div>
-      </section>
+        <!-- District -->
+        <div class="field">
+          <label for="districtSelect" data-i18n="inputs.district">District</label>
+          <select id="districtSelect" name="districtSelect" required>
+            <option value="" selected disabled data-i18n="inputs.selectDistrict">Select your district</option>
+          </select>
+          <div class="fieldHelp" data-i18n="inputs.districtHelp">Used to load provider and slab rates.</div>
+          <div class="fieldError" id="districtSelectError" aria-live="polite"></div>
+        </div>
 
-      <section class="card" aria-live="polite" aria-label="Results">
-        <h2 class="cardTitle" data-i18n="result.title">Result</h2>
+        <!-- Bill Mode -->
+        <div class="field">
+          <label for="billModeSelect" data-i18n="inputs.billMode">Bill Mode</label>
+          <select id="billModeSelect" name="billModeSelect" required disabled>
+            <option value="" selected disabled data-i18n="inputs.selectBillMode">Select bill mode</option>
+            <option value="residential" data-i18n="inputs.residential">Residential</option>
+            <option value="commercial" data-i18n="inputs.commercial">Commercial</option>
+          </select>
+          <div class="fieldHelp" data-i18n="inputs.billModeHelp">Choose tariff type for selected district.</div>
+          <div class="fieldError" id="billModeSelectError" aria-live="polite"></div>
+        </div>
+
+        <!-- Provider (auto-filled) -->
+        <div class="field">
+          <label for="providerText" data-i18n="inputs.provider">Provider</label>
+          <input id="providerText" name="providerText" type="text" placeholder="Auto-filled" disabled />
+          <div class="fieldHelp" data-i18n="inputs.providerHelp">Auto-filled when you choose a district.</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button type="submit" class="primaryBtn" id="calculateBtn" data-i18n="actions.calculate">
+            ⚡ Calculate Bill
+          </button>
+          <button type="button" class="secondaryBtn" id="resetBtn" data-i18n="actions.reset">Reset</button>
+        </div>
+
+        <!-- Trust indicators -->
+        <div class="trustBar">
+          <span class="trustItem">🔒 <span data-i18n="trust.noData">No personal data collected</span></span>
+          <span class="trustItem">💾 <span data-i18n="trust.local">Stored locally</span></span>
+          <span class="trustItem">⚡ <span data-i18n="trust.offline">Works offline</span></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="card cardAbout" id="aboutSection">
+      <h2 class="cardTitle" data-i18n="about.title">How It Works</h2>
+      <div class="aboutContent" data-i18n="about.content"></div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="card resultSection" aria-live="polite" aria-label="Results" id="resultSection">
+      <h2 class="cardTitle" data-i18n="result.title">Result</h2>
+
+      <!-- Empty state (shown before any calculation) -->
+      <div class="emptyResultState" id="emptyResultState">
+        <span class="emptyResultIcon">📊</span>
+        <p class="emptyResultTitle" data-i18n="result.emptyTitle">Your bill estimate will appear here.</p>
+        <p class="emptyResultDesc" data-i18n="result.emptyDesc">Enter readings and press Calculate.</p>
+      </div>
+
+      <!-- Filled result (hidden until calculate) -->
+      <div id="resultFilled" hidden>
+        <p class="resultReadyHeading" id="resultReadyHeading">✨ <span data-i18n="result.ready">Estimated Bill
+            Ready</span></p>
 
         <div id="resultMessage" class="message" hidden></div>
 
@@ -170,7 +350,7 @@
             <div class="statLabel" data-i18n="result.unitsUsed">Units used till today</div>
             <div class="statValue" id="unitsUsedValue">—</div>
           </div>
-          <div class="stat">
+          <div class="stat statHighlight">
             <div class="statLabel" data-i18n="result.totalBill">Total estimated bill</div>
             <div class="statValue" id="totalBillValue">—</div>
             <div class="statHint" data-i18n="result.totalHint">Includes slab-wise amount plus fixed charge.</div>
@@ -187,47 +367,203 @@
         <h3 class="sectionTitle" data-i18n="result.fixedCharges">Fixed charges (if any)</h3>
         <div id="fixedCharges" class="emptyState">—</div>
 
-        <h3 class="sectionTitle" data-i18n="result.taxes">Taxes &amp; Duties</h3>
+        <h3 class="sectionTitle">Adjustment Charge (FAC)</h3>
+        <div id="adjustmentCharge" class="emptyState">—</div>
+
+        <h3 class="sectionTitle" data-i18n="result.taxes">Estimated Govt. Charges (Approx 20%)</h3>
         <div id="taxesAndDuties" class="emptyState">—</div>
 
         <div class="note">
           <strong data-i18n="legal.privacyTitle">Privacy:</strong>
-          <span data-i18n="legal.privacyText"
-            >All calculations happen on your device. Data is stored only in localStorage.</span
-          >
+          <span data-i18n="legal.privacyText">All calculations happen on your device. Data is stored only in
+            localStorage.</span>
         </div>
 
         <div class="note noteLegal">
           <strong data-i18n="legal.disclaimerTitle">Disclaimer:</strong>
-          <span data-i18n="legal.disclaimerText"
-            >This is an estimated electricity bill calculator for learning and tracking purposes only. It is not an
-            official bill and is not affiliated with MSEDCL or any electricity board.</span
-          >
+          <span data-i18n="legal.disclaimerText">This is an estimated electricity bill calculator for learning and
+            tracking purposes only. It is not an official bill and is not affiliated with MSEDCL or any electricity
+            board.</span>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <footer class="footer">
-        <p>
-          <span data-i18n="legal.footerDisclaimer"
-            >This is an estimated electricity bill calculator for learning and tracking purposes only. It is not an
-            official bill and is not affiliated with MSEDCL or any electricity board.</span
-          >
+    <!-- ====================================================
+         ANALYTICS HUB — Smart Analytics Section
+         ==================================================== -->
+    <section class="analyticsSection" id="analyticsSection" hidden>
+      <div class="analyticsSectionHeader">
+        <h2 class="analyticsSectionTitle">📊 <span data-i18n="analytics.title">Smart Analytics</span></h2>
+        <p class="analyticsSectionSubtitle" data-i18n="analytics.subtitle">Insights from your electricity usage history
         </p>
-      </footer>
-    </main>
+      </div>
 
-    <!-- Offline-safe fallback: app can use this embedded JSON if fetch(slabs.json) fails on file:// -->
-    <script id="embeddedSlabs" type="application/json"></script>
-    <script>
-      // Always show welcome screen on page load
-      (function() {
-        const welcomeScreen = document.getElementById("welcomeScreen");
-        if (welcomeScreen) {
-          welcomeScreen.hidden = false;
-          document.body.style.overflow = "hidden";
-        }
-      })();
-    </script>
-    <script src="app.js"></script>
-  </body>
+      <!-- Row 1: Insight + Daily Cost + Tips -->
+      <div class="analyticsRow">
+
+        <!-- F3: Smart Usage Insight -->
+        <div class="analyticsCard insightCard" id="insightCard" hidden>
+          <div class="insightContent">
+            <span class="insighticon" id="insightIcon">ℹ️</span>
+            <p class="insightText" id="insightText"></p>
+          </div>
+        </div>
+
+        <!-- F4: Daily Cost -->
+        <div class="analyticsCard dailyCostCard" id="dailyCostCard" hidden>
+          <div class="dailyCostLabel" data-i18n="analytics.dailyCostLabel">Estimated Daily Cost</div>
+          <div class="dailyCostValue" id="dailyCostValue">—</div>
+          <div class="dailyCostHint" data-i18n="analytics.dailyCostHint">Based on average monthly usage</div>
+        </div>
+
+        <!-- F5: Smart Saving Tip -->
+        <div class="analyticsCard tipCard" id="tipCard" hidden>
+          <div class="tipLabel" data-i18n="analytics.tipLabel">💡 Saving Tip</div>
+          <p class="tipText" id="tipText"></p>
+        </div>
+
+      </div>
+
+      <!-- F6: Consumption Level Indicator -->
+      <div class="analyticsCard consumptionCard" id="consumptionCard" hidden>
+        <div class="consumptionHeader">
+          <span class="consumptionTitle" data-i18n="analytics.consumptionTitle">Consumption Level</span>
+          <span class="consumptionBadge" id="consumptionBadge">LOW</span>
+        </div>
+        <div class="consumptionTrack">
+          <div class="consumptionFill" id="consumptionFill"></div>
+        </div>
+        <div class="consumptionLabels">
+          <span data-i18n="analytics.low">LOW</span>
+          <span data-i18n="analytics.medium">MEDIUM</span>
+          <span data-i18n="analytics.high">HIGH</span>
+        </div>
+      </div>
+
+      <!-- F2: Bill Trend Chart -->
+      <div class="analyticsCard chartCard" id="chartCard">
+        <div class="chartCardHeader">
+          <h3 class="chartTitle" data-i18n="analytics.chartTitle">Electricity Usage Trend</h3>
+        </div>
+        <div class="chartWrap">
+          <canvas id="usageTrendChart" aria-label="Usage trend chart" role="img"></canvas>
+        </div>
+        <div class="chartEmptyState" id="chartEmptyState">
+          <span class="chartEmptyIcon">📈</span>
+          <p data-i18n="analytics.chartEmpty">Calculate your bill to see your usage trend here.</p>
+        </div>
+      </div>
+
+      <!-- F1: Usage History -->
+      <div class="analyticsCard historyCard" id="historyCard">
+        <div class="historyCardHeader">
+          <h3 class="historyTitle" data-i18n="analytics.historyTitle">📋 Usage History</h3>
+          <button class="clearHistoryBtn" id="clearHistoryBtn" data-i18n="analytics.clearHistory">Clear</button>
+        </div>
+        <div class="historyGrid" id="historyGrid">
+          <div class="historyEmptyState" id="historyEmptyState">
+            <p data-i18n="analytics.historyEmpty">No history yet. Calculate your first bill to begin tracking.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- F7: Export PDF Report -->
+      <div class="exportRow">
+        <button class="exportBtn" id="exportBtn" data-i18n="analytics.exportBtn">⬇️ Download Usage Report</button>
+        <p class="exportHint" data-i18n="analytics.exportHint">Download a PDF summary of your latest usage record.</p>
+      </div>
+
+    </section>
+
+    <footer class="footer">
+      <p>
+        <span data-i18n="legal.footerDisclaimer">This is an estimated electricity bill calculator for learning and
+          tracking purposes only. It is not an official bill and is not affiliated with MSEDCL or any electricity
+          board.</span>
+      </p>
+    </footer>
+  </main>
+
+  <!-- Meter Reading Modal (kept for full detail view) -->
+  <div id="readingModal" class="modal" hidden>
+    <div class="modalOverlay" id="modalOverlay"></div>
+    <div class="modalContent card">
+      <button class="modalClose" id="modalClose" aria-label="Close modal">×</button>
+      <h2 class="modalTitle" data-i18n="modal.title">How to Read Your Electricity Meter</h2>
+      <div class="modalBody">
+        <ol class="stepsList">
+          <li data-i18n="modal.step1">Wait until meter display shows "kWh" or "Units"</li>
+          <li data-i18n="modal.step2">Enter only the number shown with kWh</li>
+          <li data-i18n="modal.step3">Ignore voltage (V), current (A), or other changing values</li>
+          <li data-i18n="modal.step4">Ignore decimal/red digits</li>
+        </ol>
+        <!-- Meter Illustration -->
+        <div class="meterIllustration">
+          <div class="meterDevice">
+            <div class="meterDeviceTop">
+              <span class="meterDeviceLabel">⚡ Digital Electricity Meter</span>
+            </div>
+            <div class="meterRows">
+              <div class="meterRow meterRow--bad">
+                <div class="meterScreen">
+                  <span class="meterDigits">230</span>
+                  <span class="meterUnit">V</span>
+                </div>
+                <div class="meterRowInfo">
+                  <span class="meterRowStatus bad">✗</span>
+                  <div>
+                    <div class="meterRowTitle">Voltage — do not enter</div>
+                    <div class="meterRowDesc">Changes constantly, not your reading</div>
+                  </div>
+                </div>
+              </div>
+              <div class="meterRow meterRow--bad">
+                <div class="meterScreen">
+                  <span class="meterDigits">5.3</span>
+                  <span class="meterUnit">A</span>
+                </div>
+                <div class="meterRowInfo">
+                  <span class="meterRowStatus bad">✗</span>
+                  <div>
+                    <div class="meterRowTitle">Current — do not enter</div>
+                    <div class="meterRowDesc">Electrical current, not usage</div>
+                  </div>
+                </div>
+              </div>
+              <div class="meterRow meterRow--good">
+                <div class="meterScreen meterScreen--active">
+                  <img src="img/meater reading.jpeg" alt="Your meter kWh screen" class="activeIndicator" />
+                </div>
+                <div class="meterRowInfo">
+                  <span class="meterRowStatus good">✓</span>
+                  <div>
+                    <div class="meterRowTitle">Your Meter Reading</div>
+                    <div class="meterRowDesc">Enter this number in the app</div>
+                  </div>
+                </div>
+                <span class="meterRowBadge" data-i18n="inputs.yourCurrentReading">Your Current Reading</span>
+              </div>
+            </div>
+          </div>
+          <p class="meterIllustrationNote">💡 The meter cycles through screens — wait for the <strong>kWh</strong>
+            screen</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script id="embeddedSlabs" type="application/json"></script>
+  <script>
+    // Always show welcome screen on page load
+    (function () {
+      const welcomeScreen = document.getElementById("welcomeScreen");
+      if (welcomeScreen) {
+        welcomeScreen.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+    })()  </script>
+  <script src="app.js"></script>
+  <script src="analytics.js"></script>
+</body>
+
 </html>

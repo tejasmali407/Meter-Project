@@ -9,7 +9,7 @@
       "provider": "MSEDCL",
       "billModes": {
         "residential": {
-          "fixedCharge": 130,
+          "fixedCharge": 140,
           "taxesAndSurcharges": [
             { "label": "Electricity duty", "type": "percentage", "value": 16 }
           ],
@@ -20,7 +20,7 @@
           ]
         },
         "commercial": {
-          "fixedCharge": 200,
+          "fixedCharge": 140,
           "taxesAndSurcharges": [
             { "label": "Electricity duty", "type": "percentage", "value": 16 }
           ],
@@ -43,13 +43,13 @@
             { "label": "Electricity duty", "type": "percentage", "value": 5 }
           ],
           "slabs": [
-            { "from": 0, "to": 100, "rate": 4.20 },
+            { "from": 0, "to": 100, "rate": 9.50 },
             { "from": 101, "to": 300, "rate": 6.60 },
             { "from": 301, "to": null, "rate": 7.80 }
           ]
         },
         "commercial": {
-          "fixedCharge": 180,
+          "fixedCharge": 130,
           "taxesAndSurcharges": [
             { "label": "Electricity duty", "type": "percentage", "value": 5 }
           ],

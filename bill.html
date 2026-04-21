@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="description" content="Your estimated electricity bill — Meter App" />
+    <title>Your Bill — Meter</title>
+    <link rel="icon" href="/img/fab-icon.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="app" aria-label="Bill page">
+
+        <!-- Disclaimer Banner -->
+        <div class="disclaimerBanner" role="alert">
+            <span class="disclaimerBannerText">⚠️ This is <strong>NOT</strong> an official electricity bill. For
+                educational and demonstration purposes only.</span>
+        </div>
+
+        <!-- Bill Card -->
+        <section class="card billCard" id="billCard">
+            <!-- Bill Header -->
+            <div class="billHeader">
+                <div class="billHeaderLeft">
+                    <div class="billHeaderIcon">⚡</div>
+                    <div>
+                        <h1 class="billTitle">Estimated Electricity Bill</h1>
+                        <p class="billSubtitle" id="billProviderLine">—</p>
+                    </div>
+                </div>
+                <div class="billHeaderRight">
+                    <div class="billDateLabel">Generated on</div>
+                    <div class="billDate" id="billDate">—</div>
+                </div>
+            </div>
+
+            <!-- Meta row -->
+            <div class="billMetaRow">
+                <div class="billMetaItem">
+                    <div class="billMetaLabel">District</div>
+                    <div class="billMetaValue" id="bDistrict">—</div>
+                </div>
+                <div class="billMetaItem">
+                    <div class="billMetaLabel">Provider</div>
+                    <div class="billMetaValue" id="bProvider">—</div>
+                </div>
+                <div class="billMetaItem">
+                    <div class="billMetaLabel">Bill Mode</div>
+                    <div class="billMetaValue" id="bBillMode">—</div>
+                </div>
+            </div>
+
+            <div class="billDivider"></div>
+
+            <!-- Readings row -->
+            <h2 class="billSectionTitle">Meter Readings</h2>
+            <div class="billReadingsRow">
+                <div class="billReadingBox">
+                    <div class="billReadingLabel">Last Paid Reading</div>
+                    <div class="billReadingValue" id="bLastReading">—</div>
+                    <div class="billReadingUnit">kWh</div>
+                </div>
+                <div class="billReadingArrow">→</div>
+                <div class="billReadingBox">
+                    <div class="billReadingLabel">Current Reading</div>
+                    <div class="billReadingValue" id="bCurrentReading">—</div>
+                    <div class="billReadingUnit">kWh</div>
+                </div>
+                <div class="billReadingArrow">=</div>
+                <div class="billReadingBox billReadingBoxHighlight">
+                    <div class="billReadingLabel">Units Used</div>
+                    <div class="billReadingValue" id="bUnitsUsed">—</div>
+                    <div class="billReadingUnit">kWh</div>
+                </div>
+            </div>
+
+            <div class="billDivider"></div>
+
+            <!-- Slab Breakdown -->
+            <h2 class="billSectionTitle">Slab-wise Breakdown</h2>
+            <div class="tableWrap">
+                <table class="table" id="bSlabTable">
+                    <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Units</th>
+                            <th>Rate (₹/unit)</th>
+                            <th>Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bSlabBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center;color:var(--muted)">No data</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="summaryRow">
+                            <td colspan="4">Slab Subtotal</td>
+                            <td id="bSlabSubtotal">—</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="billDivider"></div>
+
+            <!-- Charges summary -->
+            <h2 class="billSectionTitle">Charges Summary</h2>
+            <ul class="list" id="bChargesList">
+                <li><span>Slab Amount</span><span id="csSlabTotal">—</span></li>
+                <li><span>Fixed Charge</span><span id="csFixed">—</span></li>
+                <li><span>Adjustment Charge (FAC)</span><span id="csAdjustment">—</span></li>
+                <li><span>Estimated Govt. Charges (Approx 20%)</span><span id="csTax">—</span></li>
+            </ul>
+
+            <!-- Total -->
+            <div class="billTotalCard">
+                <div class="billTotalLabel">Total Estimated Bill</div>
+                <div class="billTotalValue" id="bTotal">—</div>
+                <div class="billTotalHint">Includes slab amount + fixed charge + adjustment + taxes</div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="note noteLegal" style="margin-top:20px">
+                <strong>⚠️ Disclaimer:</strong> This is an estimated electricity bill for learning and tracking purposes
+                only.
+                It is <strong>not an official bill</strong> and is not affiliated with MSEDCL or any electricity board.
+                Actual bills may differ based on current tariff rates and additional charges.
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="billActions" id="billActions">
+                <button class="secondaryBtn" id="backHomeBtn" onclick="window.location.href='index.html'">← Back to
+                    Home</button>
+                <button class="primaryBtn" id="savePdfBtn">⬇ Save PDF</button>
+                <button class="secondaryBtn" id="viewHistoryBtn" onclick="window.location.href='history.html'">📋 View
+                    History</button>
+            </div>
+        </section>
+
+        <!-- No data state -->
+        <section class="card" id="noBillCard" hidden>
+            <div class="emptyResultState">
+                <span class="emptyResultIcon">📄</span>
+                <p class="emptyResultTitle">No bill data found.</p>
+                <p class="emptyResultDesc">Please go back and calculate your bill first.</p>
+                <button class="primaryBtn" style="margin-top:16px" onclick="window.location.href='index.html'">← Back to
+                    Home</button>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>This is an estimated electricity bill calculator for learning and tracking purposes only. Not an official
+                bill.</p>
+        </footer>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const LAST_BILL_KEY = 'meter:lastBill';
+
+            function fmt(n) {
+                return typeof n === 'number' && isFinite(n)
+                    ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(n)
+                    : '—';
+            }
+            function fmtMoney(n) {
+                return typeof n === 'number' && isFinite(n)
+                    ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(n)
+                    : '—';
+            }
+            function fmtDate(iso) {
+                try {
+                    return new Date(iso).toLocaleString('en-IN', {
+                        day: '2-digit', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                } catch { return iso; }
+            }
+
+            function loadBill() {
+                try { return JSON.parse(localStorage.getItem(LAST_BILL_KEY) || 'null'); }
+                catch { return null; }
+            }
+
+            function renderBill(b) {
+                const billCard = document.getElementById('billCard');
+                const noBill = document.getElementById('noBillCard');
+
+                if (!b) {
+                    if (billCard) billCard.hidden = true;
+                    if (noBill) noBill.hidden = false;
+                    return;
+                }
+
+                // Header
+                document.getElementById('billProviderLine').textContent = b.provider || '—';
+                document.getElementById('billDate').textContent = fmtDate(b.date);
+
+                // Meta
+                document.getElementById('bDistrict').textContent = b.district || '—';
+                document.getElementById('bProvider').textContent = b.provider || '—';
+                document.getElementById('bBillMode').textContent = b.billMode || '—';
+
+                // Readings
+                document.getElementById('bLastReading').textContent = fmt(b.lastReading);
+                document.getElementById('bCurrentReading').textContent = fmt(b.currentReading);
+                document.getElementById('bUnitsUsed').textContent = fmt(b.unitsUsed);
+
+                // Slab table
+                const tbody = document.getElementById('bSlabBody');
+                const slabs = b.slabBreakdown || [];
+                if (slabs.length > 0) {
+                    tbody.innerHTML = slabs.map(r => {
+                        const toLabel = r.to == null ? 'Above' : fmt(r.to);
+                        return `<tr>
+              <td>${fmt(r.from)}</td>
+              <td>${toLabel}</td>
+              <td>${fmt(r.units)}</td>
+              <td>₹ ${fmt(r.rate)}</td>
+              <td>₹ ${fmt(r.amount)}</td>
+            </tr>`;
+                    }).join('');
+                }
+                document.getElementById('bSlabSubtotal').textContent = '₹ ' + fmt(b.slabTotal);
+
+                // Charges
+                document.getElementById('csSlabTotal').textContent = '₹ ' + fmt(b.slabTotal);
+                document.getElementById('csFixed').textContent = b.fixedCharge > 0 ? '₹ ' + fmt(b.fixedCharge) : '—';
+                document.getElementById('csAdjustment').textContent = b.adjustmentCharge > 0 ? '₹ ' + fmt(b.adjustmentCharge) : '—';
+                document.getElementById('csTax').textContent = b.taxTotal > 0 ? '₹ ' + fmt(b.taxTotal) : '—';
+
+                // Total
+                document.getElementById('bTotal').textContent = fmtMoney(b.estimatedBill);
+            }
+
+            function exportBillPDF(b) {
+                if (!b) { alert('No bill data to export.'); return; }
+                if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+                    alert('PDF library is loading. Please try again in a moment.'); return;
+                }
+                const jsPDF = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
+                const doc = new jsPDF();
+                const pageW = doc.internal.pageSize.getWidth();
+                const pageH = doc.internal.pageSize.getHeight();
+
+                // Header band
+                doc.setFillColor(37, 99, 235);
+                doc.rect(0, 0, pageW, 32, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+                doc.text('Estimated Electricity Bill', 14, 16);
+                doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+                doc.text('Meter — Educational Bill Estimator', 14, 24);
+                doc.text('Generated: ' + fmtDate(b.date), pageW - 14, 10, { align: 'right' });
+
+                // Meta
+                doc.setTextColor(30, 30, 30);
+                let y = 44;
+                const metaFields = [
+                    ['District', b.district], ['Provider', b.provider],
+                    ['Bill Mode', b.billMode],
+                    ['Last Reading', fmt(b.lastReading) + ' kWh'],
+                    ['Current Reading', fmt(b.currentReading) + ' kWh'],
+                    ['Units Used', fmt(b.unitsUsed) + ' kWh'],
+                ];
+                doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+                doc.text('Bill Details', 14, y); y += 8;
+                doc.setFontSize(10);
+                metaFields.forEach(([label, value], i) => {
+                    doc.setFillColor(i % 2 === 0 ? 245 : 255, i % 2 === 0 ? 247 : 255, i % 2 === 0 ? 250 : 255);
+                    doc.rect(12, y - 5, pageW - 24, 10, 'F');
+                    doc.setFont('helvetica', 'bold'); doc.text(label, 16, y);
+                    doc.setFont('helvetica', 'normal'); doc.text(String(value), 90, y);
+                    y += 12;
+                });
+
+                y += 4;
+                doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+                doc.text('Charges', 14, y); y += 8;
+                const charges = [
+                    ['Slab Amount', '₹ ' + fmt(b.slabTotal)],
+                    ['Fixed Charge', b.fixedCharge > 0 ? '₹ ' + fmt(b.fixedCharge) : '—'],
+                    ['Adjustment Charge (FAC)', b.adjustmentCharge > 0 ? '₹ ' + fmt(b.adjustmentCharge) : '—'],
+                    ['Govt. Charges (Approx 20%)', b.taxTotal > 0 ? '₹ ' + fmt(b.taxTotal) : '—'],
+                    ['TOTAL ESTIMATED BILL', 'Rs. ' + fmt(b.estimatedBill)],
+                ];
+                charges.forEach(([label, val], i) => {
+                    const isTotal = i === charges.length - 1;
+                    doc.setFillColor(isTotal ? 37 : (i % 2 === 0 ? 245 : 255),
+                        isTotal ? 99 : (i % 2 === 0 ? 247 : 255),
+                        isTotal ? 235 : (i % 2 === 0 ? 250 : 255));
+                    doc.setTextColor(isTotal ? 255 : 30, isTotal ? 255 : 30, isTotal ? 255 : 30);
+                    doc.rect(12, y - 5, pageW - 24, 11, 'F');
+                    doc.setFontSize(isTotal ? 12 : 10);
+                    doc.setFont('helvetica', 'bold'); doc.text(label, 16, y);
+                    doc.text(String(val), pageW - 16, y, { align: 'right' });
+                    y += 13;
+                });
+
+                // Footer disclaimer
+                doc.setFillColor(245, 247, 250);
+                doc.rect(0, pageH - 20, pageW, 20, 'F');
+                doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+                doc.setTextColor(120, 120, 120);
+                doc.text('DISCLAIMER: This is an estimated bill for educational/tracking purposes only. NOT an official bill.', 14, pageH - 10);
+                doc.text('Not affiliated with MSEDCL or any electricity board. Actual bills may vary.', 14, pageH - 4);
+
+                doc.save('meter-bill-' + new Date().toISOString().slice(0, 10) + '.pdf');
+            }
+
+            // Boot
+            const bill = loadBill();
+            renderBill(bill);
+
+            const pdfBtn = document.getElementById('savePdfBtn');
+            if (pdfBtn) pdfBtn.addEventListener('click', () => exportBillPDF(bill));
+        })();
+    </script>
+</body>
+
+</html>
